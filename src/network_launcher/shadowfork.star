@@ -64,7 +64,7 @@ def shadowfork_prep(
                     + network_params.network_sync_base_url
                     + base_network
                     + "/"
-                    + el_type
+                    + "geth"
                     + "/"
                     + shadowfork_block
                     + "/snapshot.tar.zst"
