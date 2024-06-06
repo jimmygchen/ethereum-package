@@ -174,6 +174,7 @@ VOLUME_SIZE = {
         "grandine_volume_size": 150000,  # 150GB
     },
     "holesky": {
+        "geth-builder_volume_size": 100000,  # 100GB
         "geth_volume_size": 100000,  # 100GB
         "erigon_volume_size": 200000,  # 200GB
         "nethermind_volume_size": 100000,  # 100GB
