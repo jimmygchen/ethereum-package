@@ -143,6 +143,7 @@ GENESIS_TIME = {
 
 VOLUME_SIZE = {
     "mainnet": {
+        "geth-builder_volume_size": 1000000,  # 1TB
         "geth_volume_size": 1000000,  # 1TB
         "erigon_volume_size": 3000000,  # 3TB
         "nethermind_volume_size": 1000000,  # 1TB
