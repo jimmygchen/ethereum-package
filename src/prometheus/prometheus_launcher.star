@@ -1,5 +1,5 @@
 shared_utils = import_module("../shared_utils/shared_utils.star")
-prometheus = import_module("github.com/kurtosis-tech/prometheus-package/main.star")
+prometheus = import_module("github.com/jimmygchen/prometheus-package/main.star")
 
 EXECUTION_CLIENT_TYPE = "execution"
 BEACON_CLIENT_TYPE = "beacon"
@@ -13,10 +13,10 @@ METRICS_INFO_ADDITIONAL_CONFIG_KEY = "config"
 PROMETHEUS_DEFAULT_SCRAPE_INTERVAL = "15s"
 
 # The min/max CPU/memory that prometheus can use
-MIN_CPU = 10
-MAX_CPU = 1000
-MIN_MEMORY = 128
-MAX_MEMORY = 2048
+MIN_CPU = 4000
+MAX_CPU = 4000
+MIN_MEMORY = 8192
+MAX_MEMORY = 8192
 
 
 def launch_prometheus(
