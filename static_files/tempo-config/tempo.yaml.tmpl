@@ -1,0 +1,53 @@
+server:
+  http_listen_port: {{ .HTTPPort }}
+  grpc_listen_port: {{ .GRPCPort }}
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:{{ .OTLPGRPCPort }}
+        http:
+          endpoint: 0.0.0.0:{{ .OTLPHTTPPort }}
+
+ingester:
+  max_block_duration: 5m
+  max_block_bytes: 1_073_741_824
+  complete_block_timeout: 0s
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /tmp/tempo/wal
+    local:
+      path: /tmp/tempo/traces
+    block:
+      bloom_filter_false_positive: .05
+      bloom_filter_shard_size_mb: 16
+    pool:
+      max_workers: 400
+      queue_depth: 20000
+
+querier:
+  query_timeout: {{ .MaxSearchDuration }}
+
+query_frontend:
+  search:
+    duration_slo: 5s
+    throughput_bytes_slo: 1.073741824e+09
+  trace_by_id:
+    duration_slo: 5s
+
+compactor:
+  compaction:
+    compacted_block_retention: {{ .RetentionDuration }}
+
+overrides:
+  defaults:
+    ingestion_rate_strategy: local
+    ingestion_rate_limit_bytes: {{ .IngestionRateLimit }}
+    ingestion_burst_size_bytes: {{ .IngestionBurstLimit }}
+    max_bytes_per_trace: {{ .MaxBytesPerTrace }}
+    max_search_duration: {{ .MaxSearchDuration }}
