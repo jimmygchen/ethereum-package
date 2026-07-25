@@ -743,10 +743,8 @@ def run(plan, args={}):
             # Launch helix relay second
             helix_endpoint = helix_relay.launch_helix_relay(
                 plan,
-                network_params,
                 mev_params,
                 beacon_uri,
-                genesis_validators_root,
                 final_genesis_timestamp,
                 blocksim_uri,
                 persistent,
@@ -754,7 +752,6 @@ def run(plan, args={}):
                 num_participants + 1,  # Use different index for port allocation
                 global_node_selectors,
                 global_tolerations,
-                el_cl_data_files_artifact_uuid,
                 mev_params.helix_relay_image,  # Use the helix-specific image
             )
             mev_endpoints.append(helix_endpoint)
@@ -797,10 +794,8 @@ def run(plan, args={}):
         elif args_with_right_defaults.mev_type == constants.HELIX_MEV_TYPE:
             endpoint = helix_relay.launch_helix_relay(
                 plan,
-                network_params,
                 mev_params,
                 beacon_uri,
-                genesis_validators_root,
                 final_genesis_timestamp,
                 blocksim_uri,
                 persistent,
@@ -808,7 +803,6 @@ def run(plan, args={}):
                 num_participants,
                 global_node_selectors,
                 global_tolerations,
-                el_cl_data_files_artifact_uuid,
             )
             mev_endpoints.append(endpoint)
             mev_endpoint_names.append(args_with_right_defaults.mev_type)

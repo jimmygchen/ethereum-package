@@ -44,10 +44,8 @@ POSTGRES_MAX_MEMORY = 1024
 
 def launch_helix_relay(
     plan,
-    network_params,
     mev_params,
     beacon_uris,
-    genesis_validators_root,
     genesis_timestamp,
     blocksim_uri,
     persistent,
@@ -55,7 +53,6 @@ def launch_helix_relay(
     index,
     global_node_selectors,
     global_tolerations,
-    el_cl_genesis_data,
     relay_image=None,
 ):
     tolerations = shared_utils.get_tolerations(global_tolerations=global_tolerations)
@@ -96,11 +93,8 @@ def launch_helix_relay(
 
     # Generate configuration file using template
     helix_template_data = new_helix_relay_config_template_data(
-        network_params,
-        genesis_timestamp,
         blocksim_uri,
         beacon_uris,
-        genesis_validators_root,
         postgres,
     )
 
@@ -127,11 +121,21 @@ def launch_helix_relay(
     )
 
     env_vars = {
+        "ADMIN_TOKEN": "admin_token",
+        "POSTGRES_PASSWORD": "postgres",
         "RELAY_KEY": constants.DEFAULT_MEV_SECRET_KEY,
     }
 
     # Use provided relay_image if available, otherwise use mev_params.mev_relay_image
     helix_image = relay_image if relay_image else mev_params.mev_relay_image
+
+    plan.run_sh(
+        description="Waiting for genesis before starting Helix",
+        name="wait-for-helix-genesis-{}".format(index),
+        run='delay=$(({} - $(date +%s))); if [ "$delay" -gt 0 ]; then sleep "$delay"; fi'.format(
+            genesis_timestamp
+        ),
+    )
 
     endpoint = plan.add_service(
         name=HELIX_RELAY_NAME,
@@ -140,7 +144,6 @@ def launch_helix_relay(
             cmd=["--config", config_file_path],
             files={
                 HELIX_RELAY_MOUNT_DIRPATH_ON_SERVICE: config_files_artifact_name,
-                constants.GENESIS_DATA_MOUNTPOINT_ON_CLIENTS: el_cl_genesis_data,
             },
             ports=USED_PORTS,
             public_ports=public_ports,
@@ -160,19 +163,13 @@ def launch_helix_relay(
 
 
 def new_helix_relay_config_template_data(
-    network_params,
-    genesis_timestamp,
     blocksim_uri,
     beacon_uris,
-    genesis_validators_root,
     postgres,
 ):
     return {
-        "NETWORK_NAME": network_params.network,
-        "GENESIS_TIME": genesis_timestamp,
         "BLOCKSIM_URI": blocksim_uri,
         "BEACON_URI": beacon_uris,
-        "GENESIS_VALIDATORS_ROOT": genesis_validators_root,
         "POSTGRES_HOST_NAME": postgres.service.name,
         "POSTGRES_PORT": 5432,
         "POSTGRES_DB": "postgres",
@@ -182,5 +179,4 @@ def new_helix_relay_config_template_data(
         "HELIX_RELAY_WEBSITE_PORT": HELIX_RELAY_WEBSITE_PORT,
         "HELIX_RELAY_ENDPOINT_URL": "helix-relay:{}".format(HELIX_RELAY_ENDPOINT_PORT),
         "HELIX_RELAY_PUBKEY": constants.DEFAULT_MEV_PUBKEY,
-        "GENESIS_CONFIG_MOUNT_PATH_ON_CONTAINER": constants.GENESIS_DATA_MOUNTPOINT_ON_CLIENTS,
     }

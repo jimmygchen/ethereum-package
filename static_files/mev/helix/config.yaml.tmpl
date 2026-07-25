@@ -1,11 +1,6 @@
 # Optional: Custom instance identifier for logging/monitoring
 instance_id: "kurtosis-helix-relay"
 
-network_config: !Custom
-  dir_path: "{{ .GENESIS_CONFIG_MOUNT_PATH_ON_CONTAINER }}/config.json"
-  genesis_validator_root: "{{ .GENESIS_VALIDATORS_ROOT }}"
-  genesis_time: {{ .GENESIS_TIME }}
-
 # PostgreSQL Database Configuration (with TimescaleDB)
 postgres:
   hostname: "{{ .POSTGRES_HOST_NAME }}"
@@ -55,21 +50,12 @@ router_config:
   # Graceful shutdown delay (milliseconds)
   shutdown_delay_ms: 12000
 
-# Timing game configuration (for header delay strategy)
-timing_game_config:
-  max_header_delay_ms: 650
-  latest_header_delay_ms_in_slot: 2000
-  default_client_latency_ms: 150
-
 # Target propagation duration for get_payload
 target_get_payload_propagation_duration_ms: 1000
 
 # Instance type flags
 is_submission_instance: true   # Accepts block submissions
 is_registration_instance: true  # Accepts validator registrations
-
-# Admin API authentication token
-admin_token: "admin_token"
 
 # Alternative: Console logging
 logging:
@@ -90,10 +76,16 @@ website:
 
 # CPU Core Pinning (CRITICAL for production performance)
 cores:
-  auctioneer: 0             # Single core for main auctioneer thread
-  sub_workers: [0]  # Cores for submission workers
-  reg_workers: [0]  # Cores for registration workers
-  tokio: [0]    # Cores for Tokio async runtime
+  auctioneer: 0
+  tokio: [0]
+  reg_workers: [0]
+  tcp_bid_submissions_tile: 0
+  decoder: [0]
+  simulator: 0
+  top_bid: 0
+  data_gatherer: 0
+  block_merging: 0
+  housekeeper: null
 
 # Optional: Enable local development mode (disables some checks)
 is_local_dev: false
